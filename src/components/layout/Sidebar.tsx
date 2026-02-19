@@ -40,34 +40,34 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Your link — prominent */}
+      {/* Your link — very prominent */}
       {profile && (
         <div className="px-4 pt-4">
-          <p className="text-xs text-zinc-500 font-medium mb-1.5 uppercase tracking-wider">Ton lien public</p>
-          <div className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 px-3 py-2">
-            <a
-              href={profileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 min-w-0 text-xs text-violet-400 hover:text-violet-300 truncate transition-colors"
-            >
-              {window.location.host}/{profile.username}
-            </a>
-            <button
-              onClick={copyUrl}
-              className="shrink-0 text-zinc-500 hover:text-zinc-200 transition-colors"
-              title="Copier le lien"
-            >
-              {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
-            </button>
-            <a
-              href={profileUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="shrink-0 text-zinc-500 hover:text-zinc-200 transition-colors"
-            >
-              <ExternalLink size={14} />
-            </a>
+          <div className="rounded-xl p-3" style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.15), rgba(236,72,153,0.1))', border: '1px solid rgba(124,58,237,0.3)' }}>
+            <p className="text-xs font-semibold text-violet-300 mb-2 flex items-center gap-1.5">
+              🔗 Ton lien à partager
+            </p>
+            <p className="text-xs text-zinc-300 font-mono break-all leading-relaxed mb-2">
+              {window.location.host}/<span className="text-white font-bold">{profile.username}</span>
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={copyUrl}
+                className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={{ background: copied ? 'rgba(34,197,94,0.2)' : 'rgba(124,58,237,0.3)', color: copied ? '#86efac' : '#c4b5fd', border: `1px solid ${copied ? 'rgba(34,197,94,0.4)' : 'rgba(124,58,237,0.4)'}` }}
+              >
+                {copied ? <><Check size={12} /> Copié !</> : <><Copy size={12} /> Copier</>}
+              </button>
+              <a
+                href={profileUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={{ background: 'rgba(255,255,255,0.05)', color: '#a1a1aa', border: '1px solid rgba(255,255,255,0.08)' }}
+              >
+                <ExternalLink size={12} /> Voir
+              </a>
+            </div>
           </div>
         </div>
       )}

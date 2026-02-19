@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
+import { ToastProvider } from './context/ToastContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Sidebar from './components/layout/Sidebar'
 import Login from './pages/Login'
@@ -24,6 +25,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+      <ToastProvider>
         <Routes>
           {/* Public */}
           <Route path="/" element={<LandingPage />} />
@@ -39,6 +41,7 @@ export default function App() {
           {/* Public profile pages — must be last */}
           <Route path="/:username" element={<ProfilePage />} />
         </Routes>
+      </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   )

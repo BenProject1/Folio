@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react'
 import Modal from '../components/ui/Modal'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
+import { useToast } from '../context/ToastContext'
 import { THEMES } from '../data/themes'
 
 interface Props { isOpen: boolean; onClose: () => void }
 
 export default function EditProfileModal({ isOpen, onClose }: Props) {
   const { profile, refreshProfile } = useAuth()
+  const { toast } = useToast()
   const [displayName, setDisplayName] = useState('')
   const [bio, setBio] = useState('')
   const [theme, setTheme] = useState('midnight')
@@ -35,8 +37,11 @@ export default function EditProfileModal({ isOpen, onClose }: Props) {
       .eq('id', profile.id)
     if (!error) {
       await refreshProfile()
+      toast('Profil mis à jour !')
       setSaved(true)
-      setTimeout(() => { setSaved(false); onClose() }, 1000)
+      setTimeout(() => { setSaved(false); onClose() }, 800)
+    } else {
+      toast('Erreur lors de la sauvegarde', 'error')
     }
     setLoading(false)
   }

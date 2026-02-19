@@ -3,6 +3,7 @@ import Modal from '../components/ui/Modal'
 import { LINK_TYPES } from '../data/themes'
 import { addLink, updateLink } from '../services/links'
 import { useAuth } from '../context/AuthContext'
+import { useToast } from '../context/ToastContext'
 import type { FolioLink } from '../lib/supabase'
 
 interface Props {
@@ -14,6 +15,7 @@ interface Props {
 
 export default function AddLinkModal({ isOpen, onClose, onSuccess, editLink }: Props) {
   const { user } = useAuth()
+  const { toast } = useToast()
   const [title, setTitle] = useState('')
   const [url, setUrl] = useState('')
   const [icon, setIcon] = useState('🔗')
@@ -44,12 +46,15 @@ export default function AddLinkModal({ isOpen, onClose, onSuccess, editLink }: P
     try {
       if (editLink) {
         await updateLink(editLink.id, { title: title.trim(), url: finalUrl, icon, type })
+        toast('Lien mis à jour !')
       } else {
         await addLink(user.id, { title: title.trim(), url: finalUrl, icon, type })
+        toast('Lien ajouté !')
       }
       onSuccess(); onClose()
     } catch {
       setError('Something went wrong, please try again')
+      toast('Erreur lors de la sauvegarde', 'error')
     } finally {
       setLoading(false)
     }
