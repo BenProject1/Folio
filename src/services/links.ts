@@ -32,7 +32,6 @@ export async function reorderLinks(links: { id: string; position: number }[]): P
 export async function recordLinkClick(linkId: string, profileId: string): Promise<void> {
   await Promise.all([
     supabase.from('folio_link_clicks').insert({ link_id: linkId, profile_id: profileId, device: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'desktop' }),
-    supabase.from('folio_links').update({ click_count: supabase.rpc('increment') }).eq('id', linkId),
     supabase.rpc('increment_link_clicks', { link_id_param: linkId })
   ])
 }
