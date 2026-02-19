@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Modal from '../components/ui/Modal'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -8,20 +8,37 @@ interface Props { isOpen: boolean; onClose: () => void }
 
 export default function EditProfileModal({ isOpen, onClose }: Props) {
   const { profile, refreshProfile } = useAuth()
-  const [displayName, setDisplayName] = useState(profile?.display_name ?? '')
-  const [bio, setBio] = useState(profile?.bio ?? '')
-  const [theme, setTheme] = useState(profile?.theme ?? 'midnight')
-  const [accentColor, setAccentColor] = useState(profile?.accent_color ?? '#7C3AED')
+  const [displayName, setDisplayName] = useState('')
+  const [bio, setBio] = useState('')
+  const [theme, setTheme] = useState('midnight')
+  const [accentColor, setAccentColor] = useState('#7C3AED')
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
+
+  // Sync form state whenever the modal opens or profile changes
+  useEffect(() => {
+    if (isOpen && profile) {
+      setDisplayName(profile.display_name ?? '')
+      setBio(profile.bio ?? '')
+      setTheme(profile.theme ?? 'midnight')
+      setAccentColor(profile.accent_color ?? '#7C3AED')
+      setSaved(false)
+    }
+  }, [isOpen, profile])
 
   async function handleSave() {
     if (!profile) return
     setLoading(true)
-    await supabase.from('folio_profiles').update({ display_name: displayName, bio, theme, accent_color: accentColor, updated_at: new Date().toISOString() }).eq('id', profile.id)
-    await refreshProfile()
-    setLoading(false); setSaved(true)
-    setTimeout(() => { setSaved(false); onClose() }, 1000)
+    const { error } = await supabase
+      .from('folio_profiles')
+      .update({ display_name: displayName, bio, theme, accent_color: accentColor, updated_at: new Date().toISOString() })
+      .eq('id', profile.id)
+    if (!error) {
+      await refreshProfile()
+      setSaved(true)
+      setTimeout(() => { setSaved(false); onClose() }, 1000)
+    }
+    setLoading(false)
   }
 
   return (

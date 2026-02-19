@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Modal from '../components/ui/Modal'
 import { LINK_TYPES } from '../data/themes'
 import { addLink, updateLink } from '../services/links'
@@ -14,23 +14,23 @@ interface Props {
 
 export default function AddLinkModal({ isOpen, onClose, onSuccess, editLink }: Props) {
   const { user } = useAuth()
-  const [title, setTitle] = useState(editLink?.title ?? '')
-  const [url, setUrl] = useState(editLink?.url ?? '')
-  const [icon, setIcon] = useState(editLink?.icon ?? '🔗')
-  const [type, setType] = useState(editLink?.type ?? 'link')
+  const [title, setTitle] = useState('')
+  const [url, setUrl] = useState('')
+  const [icon, setIcon] = useState('🔗')
+  const [type, setType] = useState('link')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  useState(() => {
-    if (editLink) {
-      setTitle(editLink.title)
-      setUrl(editLink.url)
-      setIcon(editLink.icon)
-      setType(editLink.type)
-    } else {
-      setTitle(''); setUrl(''); setIcon('🔗'); setType('link')
+  // Reset state every time the modal opens or switches between add/edit
+  useEffect(() => {
+    if (isOpen) {
+      setTitle(editLink?.title ?? '')
+      setUrl(editLink?.url ?? '')
+      setIcon(editLink?.icon ?? '🔗')
+      setType(editLink?.type ?? 'link')
+      setError('')
     }
-  })
+  }, [isOpen, editLink])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -49,7 +49,7 @@ export default function AddLinkModal({ isOpen, onClose, onSuccess, editLink }: P
       }
       onSuccess(); onClose()
     } catch {
-      setError('Something went wrong')
+      setError('Something went wrong, please try again')
     } finally {
       setLoading(false)
     }

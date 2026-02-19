@@ -22,8 +22,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   async function fetchProfile(userId: string) {
-    const { data } = await supabase.from('folio_profiles').select('*').eq('id', userId).single()
-    if (data) setProfile(data as FolioProfile)
+    const { data } = await supabase.from('folio_profiles').select('*').eq('id', userId).maybeSingle()
+    if (data) {
+      setProfile(data as FolioProfile)
+    } else {
+      // Profile missing (trigger may have failed) — create it now
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const baseUsername = (user.user_metadata?.username ?? user.email?.split('@')[0] ?? 'user')
+          .toLowerCase().replace(/[^a-z0-9_]/g, '')
+        const fallbackUsername = baseUsername.length >= 3 ? baseUsername : `user${baseUsername}`
+        const { data: newProfile } = await supabase
+          .from('folio_profiles')
+          .insert({
+            id: userId,
+            username: fallbackUsername,
+            display_name: user.user_metadata?.full_name ?? user.user_metadata?.username ?? fallbackUsername
+          })
+          .select()
+          .single()
+        if (newProfile) setProfile(newProfile as FolioProfile)
+      }
+    }
   }
 
   useEffect(() => {

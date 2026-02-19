@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { useNavigate } from 'react-router-dom'
@@ -11,7 +11,12 @@ export default function Settings() {
   const navigate = useNavigate()
   const [showEdit, setShowEdit] = useState(false)
   const [showUpgrade, setShowUpgrade] = useState(false)
-  const [username, setUsername] = useState(profile?.username ?? '')
+  const [username, setUsername] = useState('')
+
+  // Sync username input when profile loads or changes
+  useEffect(() => {
+    if (profile) setUsername(profile.username ?? '')
+  }, [profile])
   const [usernameMsg, setUsernameMsg] = useState('')
   const [savingUsername, setSavingUsername] = useState(false)
 
