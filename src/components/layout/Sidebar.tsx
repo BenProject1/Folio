@@ -1,5 +1,6 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, Link2, BarChart3, Settings, LogOut, Sparkles, ExternalLink, Zap } from 'lucide-react'
+import { LayoutDashboard, Link2, BarChart3, Settings, LogOut, Sparkles, ExternalLink, Zap, Copy, Check } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
 const nav = [
@@ -12,10 +13,19 @@ const nav = [
 export default function Sidebar() {
   const { profile, signOut } = useAuth()
   const navigate = useNavigate()
+  const [copied, setCopied] = useState(false)
+
+  const profileUrl = profile ? `${window.location.origin}/${profile.username}` : ''
 
   async function handleSignOut() {
     await signOut()
     navigate('/login')
+  }
+
+  async function copyUrl() {
+    await navigator.clipboard.writeText(profileUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
   }
 
   return (
@@ -29,6 +39,38 @@ export default function Sidebar() {
           <span className="text-lg font-bold text-white tracking-tight">Folio</span>
         </div>
       </div>
+
+      {/* Your link — prominent */}
+      {profile && (
+        <div className="px-4 pt-4">
+          <p className="text-xs text-zinc-500 font-medium mb-1.5 uppercase tracking-wider">Ton lien public</p>
+          <div className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/60 px-3 py-2">
+            <a
+              href={profileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 min-w-0 text-xs text-violet-400 hover:text-violet-300 truncate transition-colors"
+            >
+              {window.location.host}/{profile.username}
+            </a>
+            <button
+              onClick={copyUrl}
+              className="shrink-0 text-zinc-500 hover:text-zinc-200 transition-colors"
+              title="Copier le lien"
+            >
+              {copied ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+            </button>
+            <a
+              href={profileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 text-zinc-500 hover:text-zinc-200 transition-colors"
+            >
+              <ExternalLink size={14} />
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Nav */}
       <nav className="flex-1 p-4 space-y-1">
@@ -53,17 +95,6 @@ export default function Sidebar() {
             <Sparkles size={16} />
             Upgrade to Pro
           </NavLink>
-        )}
-        {profile && (
-          <a
-            href={`/${profile.username}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-zinc-200 hover:bg-white/5 transition-all"
-          >
-            <ExternalLink size={16} />
-            View my page
-          </a>
         )}
         <div className="flex items-center gap-3 px-3 py-2 mt-2">
           <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ background: 'linear-gradient(135deg, #7C3AED, #EC4899)' }}>
